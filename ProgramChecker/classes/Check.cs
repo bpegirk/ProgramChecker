@@ -7,15 +7,15 @@ namespace ProgramChecker.classes
 {
     class Check
     {
-        const int PASCAL = 1;
-        const int C_SHARP_2008 = 2;
-        const int VB_2008 = 3;
-        const int C_PLUS_2008 = 4;
-        const int DELPHI = 5;
-        const int C_BUILDER = 6;
-        const int C_SHARP_2013 = 7;
-        const int VB_2013 = 8;
-        const int C_PLUS_2013 = 9;
+        public const int PASCAL = 1;
+        public const int C_SHARP_2008 = 2;
+        public const int VB_2008 = 3;
+        public const int C_PLUS_2008 = 4;
+        public const int DELPHI = 5;
+        public const int C_BUILDER = 6;
+        public const int C_SHARP_2013 = 7;
+        public const int VB_2013 = 8;
+        public const int C_PLUS_2013 = 9;
 
 
         public int checkId { get; set; }

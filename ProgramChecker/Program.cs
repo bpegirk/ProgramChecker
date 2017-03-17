@@ -13,6 +13,7 @@ namespace ProgramChecker
     class Program
     {
         private static IniData globalConfig;
+        private static Check activeCheck;
         static void Main(string[] args)
         {
 
@@ -78,7 +79,18 @@ namespace ProgramChecker
             try
             {
                 String fileContent = File.ReadAllText(e.FullPath);
-                Check prarm = JsonConvert.DeserializeObject<Check>(fileContent);
+                Check param = JsonConvert.DeserializeObject<Check>(fileContent);
+
+                String compileStatus = compileCode(param);
+
+                if (compileStatus == "ok")
+                {
+                    runTests(param);
+                }
+                else
+                {
+
+                }
             }
             catch (Exception ex)
             {
@@ -87,9 +99,25 @@ namespace ProgramChecker
             Console.WriteLine("Done");
         }
 
-        private static void compileCode(Check param)
+        private static String compileCode(Check param)
         {
+            // there is compiling ^^
+            String file = globalConfig["paths"]["src"] + param.fileName;
+            if (File.Exists(file))
+            {
+                Compiller cp = new Compiller(param.language, file);
 
+                bool cpStatus = cp.compile();
+                if (cpStatus)
+                {
+                    return "ok";
+                }
+                return cp.getError();
+            }
+            else
+            {
+                return "file not found";
+            }
         }
     }
 }
