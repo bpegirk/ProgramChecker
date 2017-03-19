@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace ProgramChecker.classes
         private int lang;
         private string file;
         private string lastError;
+        private string pathScript = @"C:\Users\iumag\Desktop\scripts\";
 
         public Compiller(int lang, string file)
         {
@@ -71,37 +73,53 @@ namespace ProgramChecker.classes
         }
 
         private bool comlpilePascal()
-        {
-            return true;
+        {  
+            return runScriptCompile("pasabc.cmd"); ;
         }
 
         private bool comlpileCSharp(int ver)
         {
-
-            return true;
+            return runScriptCompile(ver == 2008 ? "msvcs.cmd" : "msvcs2013.cmd");
         }
 
         private bool comlpileVB(int ver)
         {
-
-            return true;
+            return runScriptCompile(ver == 2008 ? "msvb.cmd" : "msvb2013.cmd");
         }
 
         private bool comlpileCPlus(int ver)
         {
-
-            return true;
+            return runScriptCompile(ver == 2008 ? "msvcpp.cmd" : "msvcpp2013.cmd");
         }
 
         private bool comlpileCBuilder()
-        {
-
-            return true;
+        {   
+            return runScriptCompile("cpp.cmd");
         }
         private bool comlpileDelphi()
         {
+            return runScriptCompile("delphi.cmd");
+        }
 
-            return true;
+        private bool runScriptCompile(string path)
+        {
+            var compile = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = pathScript + path,
+                    Arguments = file,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                }
+            };
+
+            compile.Start();
+
+            string[] errors = compile.StandardOutput.ReadToEnd().Split('\n');
+            lastError = errors[errors.Length - 2];
+
+            return lastError.Trim().Equals("");
         }
 
     }
