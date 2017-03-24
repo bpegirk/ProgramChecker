@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -11,10 +12,10 @@ namespace ProgramChecker.classes
 
         private int lang;
         private string file;
+        private int checkId;
         private string lastError;
-        private string pathScript = @"C:\Users\iumag\Desktop\scripts\";
 
-        public Compiller(int lang, string file)
+        public Compiller(int lang, string file, int checkId)
         {
             if (lang > 0)
             {
@@ -23,6 +24,11 @@ namespace ProgramChecker.classes
             if (file != null)
             {
                 this.file = file;
+            }
+
+            if (checkId > 0)
+            {
+                this.checkId = checkId;
             }
 
         }
@@ -68,23 +74,24 @@ namespace ProgramChecker.classes
             return result;
         }
 
-        public string getError() {
+        public string getError()
+        {
             return lastError;
         }
 
         private bool comlpilePascal()
-        {  
+        {
             return runScriptCompile("pasabc.cmd"); ;
         }
 
         private bool comlpileCSharp(int ver)
         {
-            return runScriptCompile(ver == 2008 ? "msvcs.cmd" : "msvcs2013.cmd");
+            return runScriptCompile(ver == 2008 ? "msvcs.cmd" : "msvcs2013.cmd", true);
         }
 
         private bool comlpileVB(int ver)
         {
-            return runScriptCompile(ver == 2008 ? "msvb.cmd" : "msvb2013.cmd");
+            return runScriptCompile(ver == 2008 ? "msvb.cmd" : "msvb2013.cmd", true);
         }
 
         private bool comlpileCPlus(int ver)
@@ -93,22 +100,29 @@ namespace ProgramChecker.classes
         }
 
         private bool comlpileCBuilder()
-        {   
-            return runScriptCompile("cpp.cmd");
+        {
+            return runScriptCompile("cpp.cmd", true);
         }
         private bool comlpileDelphi()
         {
             return runScriptCompile("delphi.cmd");
         }
 
-        private bool runScriptCompile(string path)
+        private bool runScriptCompile(string path, bool isExe = false)
         {
+            string pathExe = Program.globalConfig["paths"]["src"] + "check_" + checkId;
+            string pathScript = Program.globalConfig["paths"]["scripts"];
+            Directory.CreateDirectory(pathExe);
+            if (isExe)
+            {
+                pathExe = pathExe + @"\check_" + checkId + ".exe";
+            }
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + path,
-                    Arguments = file,
+                    Arguments = file + " " + pathExe,
                     RedirectStandardOutput = true,
                     UseShellExecute = false
                 }

@@ -12,7 +12,7 @@ namespace ProgramChecker
 {
     class Program
     {
-        private static IniData globalConfig;
+        public static IniData globalConfig;
         private static Check activeCheck;
         static void Main(string[] args)
         {
@@ -23,6 +23,7 @@ namespace ProgramChecker
             mainConfig["paths"]["src"] = currDir + "src\\";
             mainConfig["paths"]["queue"] = currDir + "queue\\";
             mainConfig["paths"]["results"] = currDir + "results\\";
+            mainConfig["paths"]["scripts"] = @"C:\Users\iumag\Desktop\scripts\";
             // init config
             var parser = new FileIniDataParser();
             if (!File.Exists(configFile))
@@ -80,12 +81,11 @@ namespace ProgramChecker
             {
                 String fileContent = File.ReadAllText(e.FullPath);
                 Check param = JsonConvert.DeserializeObject<Check>(fileContent);
-
                 String compileStatus = compileCode(param);
 
                 if (compileStatus == "ok")
                 {
-                    runTests(param);
+                    //runTests(param);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace ProgramChecker
             String file = globalConfig["paths"]["src"] + param.fileName;
             if (File.Exists(file))
             {
-                Compiller cp = new Compiller(param.language, file);
+                Compiller cp = new Compiller(param.language, file, param.checkId);
 
                 bool cpStatus = cp.compile();
                 if (cpStatus)
