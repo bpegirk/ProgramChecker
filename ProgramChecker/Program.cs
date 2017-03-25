@@ -85,7 +85,7 @@ namespace ProgramChecker
 
                 if (compileStatus == "ok")
                 {
-                    //runTests(param);
+                   runTests(param);
                 }
                 else
                 {
@@ -97,6 +97,17 @@ namespace ProgramChecker
                 Console.Write("Can't read file " + e.FullPath + ": " + ex.Message);
             }
             Console.WriteLine("Done");
+        }
+
+        private static void runTests(Check param)
+        {
+            var tests = param.tests;
+            int checkId = param.checkId;
+            foreach (var test in tests)
+            {
+                Testing testing = new Testing(test, checkId);
+                testing.testing();
+            }
         }
 
         private static String compileCode(Check param)

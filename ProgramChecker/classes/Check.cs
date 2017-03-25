@@ -27,7 +27,7 @@ namespace ProgramChecker.classes
         public List<Test> tests { get; set; }
     }
 
-    class Test
+    public class Test
     {
         public int id { get; set; }
         public int exerciseId { get; set; }

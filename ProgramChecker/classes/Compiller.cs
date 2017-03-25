@@ -101,7 +101,7 @@ namespace ProgramChecker.classes
 
         private bool comlpileCBuilder()
         {
-            return runScriptCompile("cpp.cmd", true);
+            return runScriptCompile("cpp.cmd");
         }
         private bool comlpileDelphi()
         {
@@ -110,13 +110,13 @@ namespace ProgramChecker.classes
 
         private bool runScriptCompile(string path, bool isExe = false)
         {
-            string pathExe = Program.globalConfig["paths"]["src"] + "check_" + checkId;
+            string pathExe = Program.globalConfig["paths"]["src"] + "check_" + checkId + @"\";
             string pathScript = Program.globalConfig["paths"]["scripts"];
             Directory.CreateDirectory(pathExe);
             if (isExe)
             {
-                pathExe = pathExe + @"\check_" + checkId + ".exe";
-            }
+                pathExe = pathExe + @"\check_" + checkId;
+            } 
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
