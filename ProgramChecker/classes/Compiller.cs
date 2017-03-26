@@ -91,7 +91,7 @@ namespace ProgramChecker.classes
 
         private bool comlpileVB(int ver)
         {
-            return runScriptCompile(ver == 2008 ? "msvb.cmd" : "msvb2013.cmd", true);
+            return runScriptCompile(ver == 2008 ? "msvb.cmd" : "msvb2013.cmd", true, true);
         }
 
         private bool comlpileCPlus(int ver)
@@ -108,7 +108,7 @@ namespace ProgramChecker.classes
             return runScriptCompile("delphi.cmd");
         }
 
-        private bool runScriptCompile(string path, bool isExe = false)
+        private bool runScriptCompile(string path, bool isExe = false, bool isEncoderVB = false)
         {
             string pathExe = Program.globalConfig["paths"]["src"] + "check_" + checkId + @"\";
             string pathScript = Program.globalConfig["paths"]["scripts"];
@@ -124,14 +124,17 @@ namespace ProgramChecker.classes
                     FileName = pathScript + path,
                     Arguments = file + " " + pathExe,
                     RedirectStandardOutput = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    StandardOutputEncoding = isEncoderVB ? Encoding.Default : null
                 }
             };
-
             compile.Start();
+            string[] allMessage = compile.StandardOutput.ReadToEnd().Split('\n');
+            string[] errors = allMessage
+                .Where(x => x.Contains("Warning") || x.Contains($"check_{checkId}.pas") || x.Contains("error") || x.Contains("Error"))
+                .ToArray();
 
-            string[] errors = compile.StandardOutput.ReadToEnd().Split('\n');
-            lastError = errors[errors.Length - 2];
+            lastError = errors.Length > 0 ? errors[errors.Length - 1] : "";
 
             return lastError.Trim().Equals("");
         }

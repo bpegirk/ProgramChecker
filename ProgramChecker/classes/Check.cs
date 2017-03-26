@@ -40,4 +40,21 @@ namespace ProgramChecker.classes
         public string result { get; set; }
 
     }
+
+    public class OutResult
+    {
+        public int checkId { get; set; }
+        public int parse_dec { get; set; }
+        public bool isError { get; set; }
+        public string error { get; set; }
+        public List<Result> results { get; set; }
+
+    }
+
+    public class Result
+    {
+        public int test_id { get; set; }
+        public bool status { get; set; }
+        public string outtext { get; set; }
+    }
 }

@@ -82,14 +82,26 @@ namespace ProgramChecker
                 String fileContent = File.ReadAllText(e.FullPath);
                 Check param = JsonConvert.DeserializeObject<Check>(fileContent);
                 String compileStatus = compileCode(param);
-
+                string resultFolder = globalConfig["paths"]["results"];
+                OutResult outResult;
                 if (compileStatus == "ok")
                 {
-                   runTests(param);
+                   outResult = runTests(param);         
                 }
                 else
                 {
+                    outResult = new OutResult()
+                    {
+                        checkId = param.checkId,
+                        isError = true,
+                        error = compileStatus
+                    };
+                }
 
+                using (FileStream fs = File.Create(resultFolder + $@"result_{param.checkId}.txt"))
+                {
+                    Byte[] input = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(outResult));
+                    fs.Write(input, 0, input.Length);
                 }
             }
             catch (Exception ex)
@@ -99,15 +111,25 @@ namespace ProgramChecker
             Console.WriteLine("Done");
         }
 
-        private static void runTests(Check param)
+        private static OutResult runTests(Check param)
         {
             var tests = param.tests;
             int checkId = param.checkId;
+            List<Result> results = new List<Result>();
             foreach (var test in tests)
             {
                 Testing testing = new Testing(test, checkId);
-                testing.testing();
+                results.Add(testing.testing());
             }
+
+            return new OutResult()
+            {
+                checkId = checkId,
+                isError = false,
+                error = "",
+                parse_dec = param.parseDec,
+                results = results
+            };
         }
 
         private static String compileCode(Check param)
