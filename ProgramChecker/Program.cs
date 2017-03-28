@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ProgramChecker.classes;
 using System.IO;
+using System.Threading;
 using IniParser;
 using IniParser.Model;
 using Newtonsoft.Json;
@@ -75,7 +76,7 @@ namespace ProgramChecker
 
         private static void fileRecived(object source, FileSystemEventArgs e)
         {
-            Console.Write("File " + Path.GetFileName(e.FullPath) + " come. Try parse...");
+            Console.Write("File " + Path.GetFileName(e.FullPath) + " come. Try parse...");  
             // try parse file
             try
             {
@@ -86,7 +87,7 @@ namespace ProgramChecker
                 OutResult outResult;
                 if (compileStatus == "ok")
                 {
-                   outResult = runTests(param);         
+                    outResult = runTests(param);
                 }
                 else
                 {
@@ -115,18 +116,23 @@ namespace ProgramChecker
         {
             var tests = param.tests;
             int checkId = param.checkId;
+            bool timeout = false;
+            string error = "";
             List<Result> results = new List<Result>();
             foreach (var test in tests)
             {
                 Testing testing = new Testing(test, checkId);
                 results.Add(testing.testing());
+                if (!timeout) timeout = testing.getTimeout();
             }
+
+            if (timeout) error = "timeout";
 
             return new OutResult()
             {
                 checkId = checkId,
-                isError = false,
-                error = "",
+                isError = timeout,
+                error = error,
                 parse_dec = param.parseDec,
                 results = results
             };

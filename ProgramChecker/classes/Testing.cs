@@ -13,6 +13,7 @@ namespace ProgramChecker.classes
     {
         private Test test;
         private int checkId;
+        private bool isForceKill;
 
         public Testing(Test test, int checkId)
         {
@@ -64,6 +65,8 @@ namespace ProgramChecker.classes
 
         private void runTestFile(string testExe, string testSrc)
         {
+            isForceKill = false;
+
             Task runTesTask = new Task(() =>
             {
                 var compile = new Process
@@ -77,13 +80,43 @@ namespace ProgramChecker.classes
                     }
                 };
                 Console.WriteLine("test");
+                compile.EnableRaisingEvents = true;
+                compile.Exited += new EventHandler(timeout);
                 compile.Start();
-                compile.WaitForExit(3000);
+                
+                if (!compile.WaitForExit(3000))
+                {
+                    isForceKill = true;
+                    Console.WriteLine(compile.PeakWorkingSet64 / 1024.0);
+                    compile.Kill();
+                    Thread.Sleep(1000);
+                    return;
+                }
             });
 
             runTesTask.Start();
 
            Task.WaitAll(runTesTask);
+        }
+
+        private void timeout(object sender, System.EventArgs e)
+        {
+            string testSrc = Program.globalConfig["paths"]["src"] + $@"check_{checkId}\" + $@"test_{test.id}\";
+            if (isForceKill)
+            {
+                using (FileStream fs = File.Create(testSrc + "/output.txt"))
+                {
+                    string message = "timeout";
+                    Byte[] input = new UTF8Encoding(true).GetBytes(message);
+                    fs.Write(input, 0, input.Length);
+                }
+            }
+          
+        }
+
+        public bool getTimeout()
+        {
+            return isForceKill;
         }
     }
 }
