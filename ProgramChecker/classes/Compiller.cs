@@ -132,7 +132,7 @@ namespace ProgramChecker.classes
      
             string[] allMessage = compile.StandardOutput.ReadToEnd().Split('\n');
             string[] errors = allMessage
-                .Where(x => x.Contains("Warning") || x.Contains($"check_{checkId}.pas") || x.Contains("error CS") || x.Contains("error BC") || x.Contains("Error"))
+                .Where(x => x.Contains("Warning") || x.Contains($"check_{checkId}.pas:") || x.Contains("error CS") || x.Contains("error BC") || x.Contains("Error"))
                 .ToArray();
 
             lastError = errors.Length > 0 ? errors[errors.Length - 1] : "";

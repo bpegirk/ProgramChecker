@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Text;
 using ProgramChecker.classes;
@@ -78,6 +79,7 @@ namespace ProgramChecker
         {
             Console.Write("File " + Path.GetFileName(e.FullPath) + " come. Try parse...");  
             // try parse file
+            Thread.Sleep(1000);
             try
             {
                 String fileContent = File.ReadAllText(e.FullPath);
@@ -116,22 +118,27 @@ namespace ProgramChecker
         {
             var tests = param.tests;
             int checkId = param.checkId;
+            int memoryLimit = param.memoryLimit;
+            int timeOut = param.timeout;
+            int parseDec = param.parseDec;
             bool timeout = false;
+            bool memeryLimit = false;
             string error = "";
             List<Result> results = new List<Result>();
             foreach (var test in tests)
             {
-                Testing testing = new Testing(test, checkId);
+                Testing testing = new Testing(test, checkId, memoryLimit, timeOut, parseDec);
                 results.Add(testing.testing());
                 if (!timeout) timeout = testing.getTimeout();
+                if (!memeryLimit) memeryLimit = testing.getMemeryLimit();
             }
 
-            if (timeout) error = "timeout";
-
+            if (timeout) error = "Timeout";
+            if (memeryLimit) error = "Memory Limit";
             return new OutResult()
             {
                 checkId = checkId,
-                isError = timeout,
+                isError = timeout || memeryLimit,
                 error = error,
                 parse_dec = param.parseDec,
                 results = results

@@ -14,11 +14,18 @@ namespace ProgramChecker.classes
         private Test test;
         private int checkId;
         private bool isForceKill;
+        private bool isMemoryLimit;
+        private int peakMemory;
+        private int timeOut;
+        private int isParseDec;
 
-        public Testing(Test test, int checkId)
+        public Testing(Test test, int checkId, int peakMemory, int timeOut, int isParseDec)
         {
             this.test = test;
             this.checkId = checkId;
+            this.peakMemory = peakMemory;
+            this.timeOut = timeOut * 1000;
+            this.isParseDec = isParseDec;
         }
 
         public Result testing()
@@ -46,13 +53,31 @@ namespace ProgramChecker.classes
 
             runTestFile(testExe, testSrc);
 
-            using (StreamReader sr = File.OpenText(testSrc + "/output.txt"))
+            if (!isMemoryLimit && !isForceKill)
             {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
+                using (StreamReader sr = File.OpenText(testSrc + "/output.txt"))
                 {
-                    outtext = s;
+                    string s = "";
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        if (isParseDec == 1)
+                        {
+                            outtext = s.Replace(',', '.');
+                        }
+                        else
+                        {
+                            outtext = s;
+                        }
+                    }
                 }
+            }
+            else if (isMemoryLimit)
+            {
+                outtext = "Memory Limit";
+            }
+            else
+            {
+                outtext = "Timeout";
             }
 
             return new Result()
@@ -66,6 +91,7 @@ namespace ProgramChecker.classes
         private void runTestFile(string testExe, string testSrc)
         {
             isForceKill = false;
+            isMemoryLimit = false;
 
             Task runTesTask = new Task(() =>
             {
@@ -78,20 +104,19 @@ namespace ProgramChecker.classes
                         UseShellExecute = false,
                         WorkingDirectory = testSrc
                     }
-                };
-                Console.WriteLine("test");
-                compile.EnableRaisingEvents = true;
-                compile.Exited += new EventHandler(timeout);
+                };    
                 compile.Start();
-                
-                if (!compile.WaitForExit(3000))
-                {
-                    isForceKill = true;
-                    Console.WriteLine(compile.PeakWorkingSet64 / 1024.0);
-                    compile.Kill();
-                    Thread.Sleep(1000);
-                    return;
-                }
+               
+                   do
+                   {
+                       if (compile.PeakPagedMemorySize64 / 1024.0 > peakMemory) isMemoryLimit = true;
+                       if (!compile.WaitForExit(timeOut))
+                       {
+                           isForceKill = true;
+                           compile.Kill();
+                       }
+
+                   } while (!compile.WaitForExit(timeOut));
             });
 
             runTesTask.Start();
@@ -99,24 +124,15 @@ namespace ProgramChecker.classes
            Task.WaitAll(runTesTask);
         }
 
-        private void timeout(object sender, System.EventArgs e)
-        {
-            string testSrc = Program.globalConfig["paths"]["src"] + $@"check_{checkId}\" + $@"test_{test.id}\";
-            if (isForceKill)
-            {
-                using (FileStream fs = File.Create(testSrc + "/output.txt"))
-                {
-                    string message = "timeout";
-                    Byte[] input = new UTF8Encoding(true).GetBytes(message);
-                    fs.Write(input, 0, input.Length);
-                }
-            }
-          
-        }
 
         public bool getTimeout()
         {
             return isForceKill;
+        }
+
+        public bool getMemeryLimit()
+        {
+            return isMemoryLimit;
         }
     }
 }

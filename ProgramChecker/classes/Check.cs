@@ -24,6 +24,8 @@ namespace ProgramChecker.classes
         public int parseDec { get; set; }
         public bool isChecked { get; set; }
         public int passCount { get; set; }
+        public int memoryLimit { get; set; }
+        public int timeout { get; set; }
         public List<Test> tests { get; set; }
     }
 
