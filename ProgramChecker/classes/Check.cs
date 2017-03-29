@@ -7,6 +7,11 @@ namespace ProgramChecker.classes
 {
     class Check
     {
+        public const int PASS_SUCCESS = 1;
+        public const int PASS_FAIL = 2;
+        public const int PASS_TIMEOUT = 3;
+        public const int PASS_MEMORY_LIMIT = 4;
+
         public const int PASCAL = 1;
         public const int C_SHARP_2008 = 2;
         public const int VB_2008 = 3;
@@ -56,7 +61,7 @@ namespace ProgramChecker.classes
     public class Result
     {
         public int test_id { get; set; }
-        public bool status { get; set; }
+        public int status { get; set; }
         public string outtext { get; set; }
         public long time { get; set; }
         public int memory { get; set; }

@@ -111,11 +111,12 @@ namespace ProgramChecker.classes
         private bool runScriptCompile(string path, bool isExe = false, bool isEncoderVB = false)
         {
             string pathExe = Program.globalConfig["paths"]["src"] + "check_" + checkId + @"\";
+            string checkFile = pathExe + "\\check_" + checkId + ".exe";
             string pathScript = Program.globalConfig["paths"]["scripts"];
             Directory.CreateDirectory(pathExe);
             if (isExe)
             {
-                pathExe = pathExe + @"\check_" + checkId + ".exe";
+                pathExe = pathExe + @"\check_" + checkId;
             }
             var compile = new Process
             {
@@ -129,7 +130,7 @@ namespace ProgramChecker.classes
                 }
             };
             compile.Start();
-
+            
             string outString = compile.StandardOutput.ReadToEnd();
             string[] allMessage = outString.Split('\n');
             string[] errors = allMessage
@@ -137,7 +138,7 @@ namespace ProgramChecker.classes
                 x.Contains("error BC") || x.Contains("Error") || x.Contains("error"))
                 .ToArray();
 
-            bool isFileExist = File.Exists(pathExe); ;
+            bool isFileExist = File.Exists(checkFile); ;
             if (!isFileExist)
             {
                 lastError = errors.Length == 0 ? outString : errors.Last();

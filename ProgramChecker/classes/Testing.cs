@@ -55,6 +55,7 @@ namespace ProgramChecker.classes
 
 
             runTestFile(testExe, testSrc);
+            int st = 0;
 
             if (!isMemoryLimit && !isForceKill)
             {
@@ -73,20 +74,32 @@ namespace ProgramChecker.classes
                         }
                     }
                 }
+                outtext = outtext.Trim();
+                test.output = test.output.Trim();
+                if (outtext.Equals(test.output))
+                {
+                    st = Check.PASS_SUCCESS;
+                }
+                else
+                {
+                    st = Check.PASS_FAIL;
+                }
             }
             else if (isMemoryLimit)
             {
+                st = Check.PASS_MEMORY_LIMIT;
                 outtext = "Memory Limit";
             }
             else
             {
+                st = Check.PASS_TIMEOUT;
                 outtext = "Timeout";
             }
 
             return new Result()
             {
                 test_id = test.id,
-                status = outtext.Equals(test.output),
+                status = st,
                 outtext = outtext,
                 memory = spentMemory,
                 time = spentTime
