@@ -115,8 +115,8 @@ namespace ProgramChecker.classes
             Directory.CreateDirectory(pathExe);
             if (isExe)
             {
-                pathExe = pathExe + @"\check_" + checkId;
-            } 
+                pathExe = pathExe + @"\check_" + checkId + ".exe";
+            }
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -129,15 +129,21 @@ namespace ProgramChecker.classes
                 }
             };
             compile.Start();
-     
-            string[] allMessage = compile.StandardOutput.ReadToEnd().Split('\n');
+
+            string outString = compile.StandardOutput.ReadToEnd();
+            string[] allMessage = outString.Split('\n');
             string[] errors = allMessage
-                .Where(x => x.Contains("Warning") || x.Contains($"check_{checkId}.pas:") || x.Contains("error CS") || x.Contains("error BC") || x.Contains("Error"))
+                .Where(x => x.Contains("Warning") || x.Contains($"check_{checkId}.pas:") || x.Contains("error CS") ||
+                x.Contains("error BC") || x.Contains("Error") || x.Contains("error"))
                 .ToArray();
 
-            lastError = errors.Length > 0 ? errors[errors.Length - 1] : "";
+            bool isFileExist = File.Exists(pathExe); ;
+            if (!isFileExist)
+            {
+                lastError = errors.Length == 0 ? outString : errors.Last();
+            }
 
-            return lastError.Trim().Equals("");
+            return isFileExist;
         }
 
     }

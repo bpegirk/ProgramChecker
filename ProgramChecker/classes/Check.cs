@@ -58,5 +58,7 @@ namespace ProgramChecker.classes
         public int test_id { get; set; }
         public bool status { get; set; }
         public string outtext { get; set; }
+        public long time { get; set; }
+        public int memory { get; set; }
     }
 }

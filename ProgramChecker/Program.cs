@@ -15,7 +15,7 @@ namespace ProgramChecker
     class Program
     {
         public static IniData globalConfig;
-        private static Check activeCheck;
+        //private static Check activeCheck;
         static void Main(string[] args)
         {
 
@@ -53,6 +53,16 @@ namespace ProgramChecker
             {
                 Directory.CreateDirectory(globalConfig["paths"]["results"]);
             }
+            if (!Directory.Exists(globalConfig["paths"]["scripts"]))
+            {
+                Directory.CreateDirectory(globalConfig["paths"]["scripts"]);
+            }
+            // check exist files
+            foreach (String file in Directory.GetFiles(globalConfig["paths"]["queue"], "*.new"))
+            {
+                runCheck(file);
+            }
+
             // run folder listiner
             listenFolder();
 
@@ -77,22 +87,37 @@ namespace ProgramChecker
 
         private static void fileRecived(object source, FileSystemEventArgs e)
         {
-            Console.Write("File " + Path.GetFileName(e.FullPath) + " come. Try parse...");  
+            runCheck(e.FullPath);
+        }
+
+        private static void runCheck(String file)
+        {
+            Console.WriteLine("File " + Path.GetFileName(file) + " come. Start work");
             // try parse file
             Thread.Sleep(1000);
             try
             {
-                String fileContent = File.ReadAllText(e.FullPath);
+                String fileContent = File.ReadAllText(file);
+                Console.Write("==> Try parse JSON ... ");
                 Check param = JsonConvert.DeserializeObject<Check>(fileContent);
+                Console.WriteLine("DONE.");
+
+                Console.Write("==> Try parse compile... ");
                 String compileStatus = compileCode(param);
+
                 string resultFolder = globalConfig["paths"]["results"];
                 OutResult outResult;
                 if (compileStatus == "ok")
                 {
+                    Console.WriteLine("DONE.");
+
+                    Console.Write("==> Run tests...");
                     outResult = runTests(param);
+                    Console.WriteLine("DONE.");
                 }
                 else
                 {
+                    Console.WriteLine("error: " + compileStatus);
                     outResult = new OutResult()
                     {
                         checkId = param.checkId,
@@ -100,18 +125,22 @@ namespace ProgramChecker
                         error = compileStatus
                     };
                 }
-
+                Console.Write("==> Write data to result.txt ... ");
                 using (FileStream fs = File.Create(resultFolder + $@"result_{param.checkId}.txt"))
                 {
                     Byte[] input = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(outResult));
                     fs.Write(input, 0, input.Length);
                 }
+                Console.WriteLine("DONE.");
             }
             catch (Exception ex)
             {
-                Console.Write("Can't read file " + e.FullPath + ": " + ex.Message);
+                Console.Write("Can't read file " + file + ": " + ex.Message);
             }
-            Console.WriteLine("Done");
+            Console.WriteLine("CheckDone");
+            // rename file
+            File.Move(file, file.Substring(0, file.Length - 3) + "old");
+            Console.WriteLine("####### Wait next #########");
         }
 
         private static OutResult runTests(Check param)

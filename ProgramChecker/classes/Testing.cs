@@ -17,7 +17,10 @@ namespace ProgramChecker.classes
         private bool isMemoryLimit;
         private int peakMemory;
         private int timeOut;
+        private long spentTime;
+        private int spentMemory;
         private int isParseDec;
+
 
         public Testing(Test test, int checkId, int peakMemory, int timeOut, int isParseDec)
         {
@@ -84,7 +87,9 @@ namespace ProgramChecker.classes
             {
                 test_id = test.id,
                 status = outtext.Equals(test.output),
-                outtext = outtext
+                outtext = outtext,
+                memory = spentMemory,
+                time = spentTime
             };
         }
 
@@ -104,24 +109,30 @@ namespace ProgramChecker.classes
                         UseShellExecute = false,
                         WorkingDirectory = testSrc
                     }
-                };    
+                };
+                spentTime = 0;
+                Stopwatch w = new Stopwatch();
                 compile.Start();
-               
-                   do
-                   {
-                       if (compile.PeakPagedMemorySize64 / 1024.0 > peakMemory) isMemoryLimit = true;
-                       if (!compile.WaitForExit(timeOut))
-                       {
-                           isForceKill = true;
-                           compile.Kill();
-                       }
+                w.Start();
+                do
+                {
+                    if (compile.PeakPagedMemorySize64 / 1024.0 > peakMemory) isMemoryLimit = true;
+                    if (!compile.WaitForExit(timeOut))
+                    {
+                        isForceKill = true;
+                        compile.Kill();
+                    }
 
-                   } while (!compile.WaitForExit(timeOut));
+                } while (!compile.WaitForExit(timeOut));
+                w.Stop();
+                spentTime = w.ElapsedMilliseconds;
+                spentMemory = (int)(compile.PeakPagedMemorySize64 / 1024.0);
             });
+
 
             runTesTask.Start();
 
-           Task.WaitAll(runTesTask);
+            Task.WaitAll(runTesTask);
         }
 
 
