@@ -59,24 +59,14 @@ namespace ProgramChecker.classes
 
             if (!isMemoryLimit && !isForceKill)
             {
-                using (StreamReader sr = File.OpenText(testSrc + "/output.txt"))
+                using (StreamReader sr = new StreamReader(testSrc + "/output.txt"))
                 {
-                    string s = "";
-                    while ((s = sr.ReadLine()) != null)
-                    {
-                        if (isParseDec == 1)
-                        {
-                            outtext = s.Replace(',', '.');
-                        }
-                        else
-                        {
-                            outtext = s;
-                        }
-                    }
+                    outtext = clearString(sr.ReadToEnd(), isParseDec);
+
                 }
-                outtext = outtext.Trim();
-                test.output = test.output.Trim();
-                if (outtext.Equals(test.output))
+
+                String testValue = clearString(test.output, isParseDec);
+                if (outtext.Equals(testValue))
                 {
                     st = Check.PASS_SUCCESS;
                 }
@@ -105,12 +95,31 @@ namespace ProgramChecker.classes
                 time = spentTime
             };
         }
+        private String clearString(String s, int parseDec)
+        {
+            String[] splited = s.Replace("\r", "").Trim().Split('\n');
+
+            for (int i = 0; i < splited.Length; i++)
+            {
+                splited[i] = splited[i].Trim();
+                if (isParseDec == 1)
+                {
+                    splited[i] += splited[i].Replace(',', '.');
+                }
+            }
+            String outStr = "";
+            foreach (String p in splited)
+            {
+                outStr += p + "\n";
+            }
+            return outStr.Trim();
+        }
 
         private void runTestFile(string testExe, string testSrc)
         {
             isForceKill = false;
             isMemoryLimit = false;
-
+            Thread.Sleep(300);// timeout for hold  and clear processes
             Task runTesTask = new Task(() =>
             {
                 var compile = new Process
