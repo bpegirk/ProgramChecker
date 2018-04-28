@@ -104,7 +104,7 @@ namespace ProgramChecker.classes
                 splited[i] = splited[i].Trim();
                 if (isParseDec == 1)
                 {
-                    splited[i] += splited[i].Replace(',', '.');
+                    splited[i] = splited[i].Replace(',', '.');
                 }
             }
             String outStr = "";
