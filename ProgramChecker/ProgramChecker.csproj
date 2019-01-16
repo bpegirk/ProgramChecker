@@ -55,6 +55,15 @@
     <Compile Include="classes\Check.cs" />
     <Compile Include="classes\Compiller.cs" />
     <Compile Include="classes\Testing.cs" />
+    <Compile Include="Languages\Cpp.cs" />
+    <Compile Include="Languages\CSharp.cs" />
+    <Compile Include="Languages\Delphi.cs" />
+    <Compile Include="Languages\Java.cs" />
+    <Compile Include="Languages\Language.cs" />
+    <Compile Include="Languages\Pascal.cs" />
+    <Compile Include="Languages\Python.cs" />
+    <Compile Include="Languages\VB.cs" />
+    <Compile Include="Languages\VCpp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +73,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

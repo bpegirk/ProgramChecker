@@ -9,6 +9,7 @@ using System.Threading;
 using IniParser;
 using IniParser.Model;
 using Newtonsoft.Json;
+using ProgramChecker.Languages;
 
 namespace ProgramChecker
 {
@@ -71,7 +72,7 @@ namespace ProgramChecker
         }
 
         private static void listenFolder()
-        {
+        { 
             String srcFolder = globalConfig["paths"]["src"];
             string queueFolder = globalConfig["paths"]["queue"];
 
@@ -180,7 +181,7 @@ namespace ProgramChecker
             String file = globalConfig["paths"]["src"] + param.fileName;
             if (File.Exists(file))
             {
-                Compiller cp = new Compiller(param.language, file, param.checkId);
+                Compiller cp = new Compiller(param);
 
                 bool cpStatus = cp.compile();
                 if (cpStatus)

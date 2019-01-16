@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProgramChecker.classes
 {
-    class Check
+    public class Check
     {
         public const int PASS_SUCCESS = 1;
         public const int PASS_FAIL = 2;
@@ -21,6 +21,8 @@ namespace ProgramChecker.classes
         public const int C_SHARP_2013 = 7;
         public const int VB_2013 = 8;
         public const int C_PLUS_2013 = 9;
+        public const int JAVA = 10;
+        public const int PYTHON = 11;
 
 
         public int checkId { get; set; }

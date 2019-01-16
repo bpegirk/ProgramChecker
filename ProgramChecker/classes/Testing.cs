@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ProgramChecker.Languages;
 
 namespace ProgramChecker.classes
 {
@@ -20,7 +21,7 @@ namespace ProgramChecker.classes
         private long spentTime;
         private int spentMemory;
         private int isParseDec;
-
+   
 
         public Testing(Test test, int checkId, int peakMemory, int timeOut, int isParseDec)
         {
@@ -33,19 +34,20 @@ namespace ProgramChecker.classes
 
         public Result testing()
         {
+            string outtext = "";
+
             string pathSrc = Program.globalConfig["paths"]["src"] + $@"check_{checkId}\";
             string testSrc = pathSrc + $@"test_{test.id}\";
-            string testExe = testSrc + $"check_{checkId}.exe";
-            string outtext = "";
+
+
             if (!Directory.Exists(testSrc))
             {
                 Directory.CreateDirectory(testSrc);
             }
 
-            if (File.Exists(pathSrc + $"check_{checkId}.exe"))
-            {
-                File.Copy(pathSrc + $"check_{checkId}.exe", testExe);
-            }
+
+            Language language = Compiller.language;
+            string file = language.prepareTesting(test);
 
             using (FileStream fs = File.Create(testSrc + "/input.txt"))
             {
@@ -53,8 +55,7 @@ namespace ProgramChecker.classes
                 fs.Write(input, 0, input.Length);
             }
 
-
-            runTestFile(testExe, testSrc);
+            runTestFile(file, testSrc, language);
             int st = 0;
 
             if (!isMemoryLimit && !isForceKill)
@@ -115,23 +116,15 @@ namespace ProgramChecker.classes
             return outStr.Trim();
         }
 
-        private void runTestFile(string testExe, string testSrc)
+        private void runTestFile(string testExe, string testSrc, Language language)
         {
+            string pathScript = Program.globalConfig["paths"]["scripts"];
             isForceKill = false;
             isMemoryLimit = false;
             Thread.Sleep(300);// timeout for hold  and clear processes
             Task runTesTask = new Task(() =>
             {
-                var compile = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = testExe,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        WorkingDirectory = testSrc
-                    }
-                };
+                var compile = language.createTestProcess(testExe, testSrc);
                 spentTime = 0;
                 Stopwatch w = new Stopwatch();
                 compile.Start();
