@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ProgramChecker.classes;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ProgramChecker.Languages
 {
@@ -19,6 +21,8 @@ namespace ProgramChecker.Languages
         }
         public override bool compile()
         {
+           replaceClassName();
+           
            return runScriptCompile(nameFile);
         }
 
@@ -55,7 +59,7 @@ namespace ProgramChecker.Languages
 
         public override bool afterCompile()
         {
-            bool isFileExist = File.Exists(checkFile); ;
+            bool isFileExist = File.Exists(checkFile);
             if (!isFileExist)
             {
                 lastError = errors.Length == 0 ? outString : errors.Last();
@@ -66,6 +70,26 @@ namespace ProgramChecker.Languages
             }
 
             return isFileExist;
+        }
+
+        private void replaceClassName( )
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            string pattern = @"(?<=public class ).[^[{]+";
+            Regex rgx = new Regex(pattern);
+            string className = rgx.Match(str).ToString();
+            
+            str = Regex.Replace(str, pattern, $"check_{check.checkId}");
+            str = str.Replace(className, $"check_{check.checkId}");
+            using (StreamWriter file = new StreamWriter(pathFile))
+            {
+                file.Write(str);
+            }
         }
 
         public override string prepareTesting(Test test)
