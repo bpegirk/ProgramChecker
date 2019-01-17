@@ -17,24 +17,23 @@ namespace ProgramChecker.Languages
 
         public Java(Check check) : base(check, "class")
         {
-
         }
+
         public override bool compile()
         {
-           replaceClassName();
-           
-           return runScriptCompile(nameFile);
+            replaceClassName();
+
+            return runScriptCompile(nameFile);
         }
 
-        public override Process createProcess()
+        protected override Process createProcess()
         {
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + nameScript,
-                    Arguments = pathFile + " " + pathExe,
-                    RedirectStandardOutput = true,
+                    Arguments = pathFile + " " + pathCompile,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     StandardOutputEncoding = null,
@@ -43,36 +42,30 @@ namespace ProgramChecker.Languages
 
             return compile;
         }
-
-        public override string[] checkError()
+        
+        protected override void checkError()
         {
-            outString = compileProcess.StandardOutput.ReadToEnd();
             string error = compileProcess.StandardError.ReadToEnd();
-            string[] allMessage = outString.Split('\n').Concat(error.Split('\n')).ToArray();
-            errors = allMessage
-                .Where(x => x.Contains("Warning") || x.Contains($"check_{check.checkId}.pas:") || x.Contains("error CS") ||
-                x.Contains("error BC") || x.Contains("Error") || x.Contains("error"))
-                .ToArray();
-
-            return errors;
+            errors = error.Split('\n').ToArray();
         }
 
-        public override bool afterCompile()
+        protected override bool afterCompile()
         {
             bool isFileExist = File.Exists(checkFile);
             if (!isFileExist)
             {
-                lastError = errors.Length == 0 ? outString : errors.Last();
+                lastError = errors.Length == 0 ? outString : errors.First();
             }
             else
             {
-                File.Copy(pathFile, pathExe + "\\check_" + check.checkId + ".java");
+                if (!File.Exists(pathCompile + "\\check_" + check.checkId + ".java"))
+                    File.Copy(pathFile, pathCompile + "\\check_" + check.checkId + ".java");
             }
 
             return isFileExist;
         }
 
-        private void replaceClassName( )
+        private void replaceClassName()
         {
             string str = string.Empty;
             using (StreamReader reader = File.OpenText(pathFile))
@@ -83,7 +76,7 @@ namespace ProgramChecker.Languages
             string pattern = @"(?<=public class ).[^[{]+";
             Regex rgx = new Regex(pattern);
             string className = rgx.Match(str).ToString();
-            
+
             str = Regex.Replace(str, pattern, $"check_{check.checkId}");
             str = str.Replace(className, $"check_{check.checkId}");
             using (StreamWriter file = new StreamWriter(pathFile))
@@ -108,14 +101,14 @@ namespace ProgramChecker.Languages
             return $"check_{checkId}";
         }
 
-        public override Process createTestProcess(string testExe, string testSrc)
+        public override Process createTestProcess(string testFile, string testSrc)
         {
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + "javarun.cmd",
-                    Arguments = testExe,
+                    Arguments = testFile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
@@ -124,6 +117,5 @@ namespace ProgramChecker.Languages
 
             return compile;
         }
-
     }
 }

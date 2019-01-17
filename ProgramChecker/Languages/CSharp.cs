@@ -9,14 +9,23 @@ namespace ProgramChecker.Languages
 {
     class CSharp : Language
     {
-        private static string nameScript = "msvcs2013.cmd";
+        private new static string nameScript = "msvcs2013.cmd";
         public CSharp(Check check) : base(check)
         {
+            pathCompile += @"\check_" + check.checkId;
         }
 
         public override bool compile()
         {
-            return runScriptCompile(nameScript, true);
+            return runScriptCompile(nameScript);
+        }
+
+        protected override void checkError()
+        {
+            base.checkError();
+            errors = errors
+                .Where(x => x.Contains("error CS"))
+                .ToArray();
         }
     }
 }

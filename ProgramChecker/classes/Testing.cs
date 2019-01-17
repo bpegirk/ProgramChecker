@@ -55,7 +55,7 @@ namespace ProgramChecker.classes
                 fs.Write(input, 0, input.Length);
             }
 
-            runTestFile(file, testSrc, language);
+            runTestFile(file, testSrc);
             int st = 0;
 
             if (!isMemoryLimit && !isForceKill)
@@ -116,7 +116,7 @@ namespace ProgramChecker.classes
             return outStr.Trim();
         }
 
-        private void runTestFile(string testExe, string testSrc, Language language)
+        private void runTestFile(string testExe, string testSrc)
         {
             string pathScript = Program.globalConfig["paths"]["scripts"];
             isForceKill = false;
@@ -124,6 +124,7 @@ namespace ProgramChecker.classes
             Thread.Sleep(300);// timeout for hold  and clear processes
             Task runTesTask = new Task(() =>
             {
+                Language language = Compiller.language;
                 var compile = language.createTestProcess(testExe, testSrc);
                 spentTime = 0;
                 Stopwatch w = new Stopwatch();

@@ -11,6 +11,8 @@ namespace ProgramChecker.Languages
 {
     public abstract class Language
     {
+        protected string pathScript = Program.globalConfig["paths"]["scripts"];
+
         public static Dictionary<int, string> languages = new Dictionary<int, string>
         {
             {Check.PASCAL, "Pascal"},
@@ -23,24 +25,26 @@ namespace ProgramChecker.Languages
             {Check.PYTHON, "Python"}
         };
 
-        protected Check check;
+        protected readonly Check check;
         protected string lastError;
-        protected string pathScript = Program.globalConfig["paths"]["scripts"];
-        protected string pathExe;
+        protected string pathCompile;
+        private readonly string pathCheck;
         protected string nameScript;
-        protected string pathFile;
-        protected string checkFile;
+        protected readonly string pathFile;
+        protected readonly string checkFile;
         protected Process compileProcess;
         protected string outString;
         protected string[] errors;
-        protected string checkExtension;
-        public Language(Check check, string checkExtension = "exe")
+        private readonly string extension;
+
+        protected Language(Check check, string extension = "exe")
         {
             this.check = check;
-            pathExe = Program.globalConfig["paths"]["src"] + "check_" + check.checkId + @"\";
+            pathCompile = Program.globalConfig["paths"]["src"] + "check_" + check.checkId + @"\";
+            pathCheck = Program.globalConfig["paths"]["src"] + "check_" + check.checkId + @"\";
             pathFile = Program.globalConfig["paths"]["src"] + check.fileName;
-            checkFile = pathExe + "\\check_" + check.checkId + "." + checkExtension;
-            this.checkExtension = checkExtension;
+            checkFile = pathCompile + "\\check_" + check.checkId + "." + extension;
+            this.extension = extension;
         }
 
         public abstract bool compile();
@@ -51,23 +55,23 @@ namespace ProgramChecker.Languages
 
             string pathSrc = Program.globalConfig["paths"]["src"] + $@"check_{checkId}\";
             string testSrc = pathSrc + $@"test_{test.id}\";
-            string testExe = testSrc + $"check_{checkId}.{checkExtension}";
+            string testExe = testSrc + $"check_{checkId}.{extension}";
 
-            if (File.Exists(pathSrc + $"check_{checkId}.{checkExtension}"))
+            if (File.Exists(pathSrc + $"check_{checkId}.{extension}"))
             {
-                File.Copy(pathSrc + $"check_{checkId}.{checkExtension}", testExe);
+                File.Copy(pathSrc + $"check_{checkId}.{extension}", testExe);
             }
 
             return testExe;
         }
 
-        public virtual Process createTestProcess(string testExe, string testSrc)
+        public virtual Process createTestProcess(string testFile, string testSrc)
         {
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = testExe,
+                    FileName = testFile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
@@ -77,34 +81,28 @@ namespace ProgramChecker.Languages
             return compile;
         }
 
-        protected bool runScriptCompile(string nameScript, bool isExe = false, bool isEncoderVB = false)
+        protected bool runScriptCompile(string nameScript)
         {
             this.nameScript = nameScript;
-            int checkId = check.checkId;
 
-            Directory.CreateDirectory(pathExe);
-
-            if (isExe)
-            {
-                pathExe = pathExe + @"\check_" + checkId;
-            }
+            Directory.CreateDirectory(pathCheck);
 
             compileProcess = createProcess();
             compileProcess.Start();
 
-            string[] errors = checkError();
+            checkError();
 
             return afterCompile();
         }
-        
-        public virtual Process createProcess()
+
+        protected virtual Process createProcess()
         {
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + nameScript,
-                    Arguments = pathFile + " " + pathExe,
+                    Arguments = pathFile + " " + pathCompile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     StandardOutputEncoding = null,
@@ -113,21 +111,14 @@ namespace ProgramChecker.Languages
 
             return compile;
         }
-        
-        public virtual string[] checkError()
+
+        protected virtual void checkError()
         {
             string outString = compileProcess.StandardOutput.ReadToEnd();
-            string[] allMessage = outString.Split('\n');
-            errors = allMessage
-                .Where(x => x.Contains("Warning") || x.Contains($"check_{check.checkId}.pas:") ||
-                            x.Contains("error CS") ||
-                            x.Contains("error BC") || x.Contains("Error") || x.Contains("error"))
-                .ToArray();
-
-            return errors;
+            errors = outString.Split('\n');  
         }
-        
-        public virtual bool afterCompile()
+
+        protected virtual bool afterCompile()
         {
             bool isFileExist = File.Exists(checkFile);
             ;
@@ -148,9 +139,9 @@ namespace ProgramChecker.Languages
         {
             Type TestType = Type.GetType($"ProgramChecker.Languages.{languages[check.language]}", false, true);
             Language language = null;
-           
+
             if (TestType != null)
-            { 
+            {
                 System.Reflection.ConstructorInfo ci = TestType.GetConstructor(new Type[] {typeof(Check)});
 
                 language = (Language) ci.Invoke(new object[] {check});

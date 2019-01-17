@@ -1,3 +1,4 @@
+using System.Linq;
 using ProgramChecker.classes;
 
 namespace ProgramChecker.Languages
@@ -13,6 +14,14 @@ namespace ProgramChecker.Languages
         public override bool compile()
         {
             return runScriptCompile(nameFile);
+        }
+        
+        protected override void checkError()
+        {
+            base.checkError();
+            errors = errors
+                .Where(x => x.Contains("Error"))
+                .ToArray();
         }
     }
 }

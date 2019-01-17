@@ -1,12 +1,15 @@
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using ProgramChecker.classes;
 
 namespace ProgramChecker.Languages
 {
     class Python : Language
     {
-        private static string nameScript = "python.cmd";
+        private new static string nameScript = "python.cmd";
 
         public Python(Check check) : base(check, "py")
         {
@@ -14,14 +17,48 @@ namespace ProgramChecker.Languages
 
         public override bool compile()
         {
-            Directory.CreateDirectory(pathExe);
-            string testFile = $"{pathExe}check_{check.checkId}.py";
+            Directory.CreateDirectory(pathCompile);
+            string testFile = $"{pathCompile}check_{check.checkId}.py";
             if (!File.Exists(testFile))
                 File.Copy(pathFile, testFile);
-            File.Create($"{pathExe}input.txt").Close();
-            File.Create($"{pathExe}output.txt").Close();
+            using (FileStream fs = File.Create(pathCompile + "input.txt"))
+            {
+                Byte[] input = new UTF8Encoding(true).GetBytes(check.tests[0].input);
+                fs.Write(input, 0, input.Length);
+            }
 
-            return afterCompile();
+            File.Create($"{pathCompile}output.txt").Close();
+
+            return runScriptCompile(nameScript);
+        }
+
+        protected override Process createProcess()
+        {
+            var compile = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = pathScript + nameScript,
+                    Arguments = checkFile + " " + pathCompile,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    StandardOutputEncoding = null,
+                    WorkingDirectory = pathCompile
+                }
+            };
+
+            return compile;
+        }
+
+        protected override bool afterCompile()
+        {
+            return lastError == "";
+        }
+
+        protected override void checkError()
+        {
+            lastError = compileProcess.StandardError.ReadToEnd();     
         }
 
         public override string prepareTesting(Test test)
@@ -34,14 +71,14 @@ namespace ProgramChecker.Languages
             return base.prepareTesting(test);
         }
 
-        public override Process createTestProcess(string testExe, string testSrc)
+        public override Process createTestProcess(string testFile, string testSrc)
         {
             var compile = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + "python.cmd",
-                    Arguments = testExe,
+                    Arguments = testFile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
