@@ -132,6 +132,7 @@ namespace ProgramChecker.classes
                 w.Start();
                 do
                 {
+                    if(compile.HasExited) break;
                     if (compile.PeakPagedMemorySize64 / 1024.0 > peakMemory) isMemoryLimit = true;
                     if (!compile.WaitForExit(timeOut))
                     {
