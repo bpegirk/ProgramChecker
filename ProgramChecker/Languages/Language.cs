@@ -59,7 +59,8 @@ namespace ProgramChecker.Languages
 
             if (File.Exists(pathSrc + $"check_{checkId}.{extension}"))
             {
-                File.Copy(pathSrc + $"check_{checkId}.{extension}", testExe);
+                if (!File.Exists(testExe))
+                    File.Copy(pathSrc + $"check_{checkId}.{extension}", testExe);
             }
 
             return testExe;
@@ -115,7 +116,7 @@ namespace ProgramChecker.Languages
         protected virtual void checkError()
         {
             string outString = compileProcess.StandardOutput.ReadToEnd();
-            errors = outString.Split('\n');  
+            errors = outString.Split('\n');
         }
 
         protected virtual bool afterCompile()

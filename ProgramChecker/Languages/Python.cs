@@ -58,7 +58,7 @@ namespace ProgramChecker.Languages
 
         protected override void checkError()
         {
-            lastError = compileProcess.StandardError.ReadToEnd();     
+            lastError = compileProcess.StandardError.ReadToEnd();
         }
 
         public override string prepareTesting(Test test)
@@ -67,7 +67,8 @@ namespace ProgramChecker.Languages
 
             string pathSrc = Program.globalConfig["paths"]["src"] + $@"check_{checkId}\";
             string testSrc = pathSrc + $@"test_{test.id}\";
-            File.Create($"{testSrc}output.txt").Close();
+            if (!File.Exists($"{testSrc}output.txt"))
+                File.Create($"{testSrc}output.txt").Close();
             return base.prepareTesting(test);
         }
 

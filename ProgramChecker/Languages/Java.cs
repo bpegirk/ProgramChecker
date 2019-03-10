@@ -42,7 +42,7 @@ namespace ProgramChecker.Languages
 
             return compile;
         }
-        
+
         protected override void checkError()
         {
             string error = compileProcess.StandardError.ReadToEnd();
@@ -94,8 +94,10 @@ namespace ProgramChecker.Languages
 
             if (File.Exists(pathSrc + $"check_{checkId}.java"))
             {
-                File.Copy(pathSrc + $"check_{checkId}.java", testSrc + $"check_{checkId}.java");
-                File.Copy(pathSrc + $"check_{checkId}.class", testSrc + $"check_{checkId}.class");
+                if (!File.Exists(testSrc + $"check_{checkId}.java"))
+                    File.Copy(pathSrc + $"check_{checkId}.java", testSrc + $"check_{checkId}.java");
+                if (!File.Exists(testSrc + $"check_{checkId}.class"))
+                    File.Copy(pathSrc + $"check_{checkId}.class", testSrc + $"check_{checkId}.class");
             }
 
             return $"check_{checkId}";
