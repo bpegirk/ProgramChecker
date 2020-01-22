@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using ProgramChecker.classes;
 
@@ -15,7 +16,18 @@ namespace ProgramChecker.Languages
         {
             return runScriptCompile(nameScript);
         }
-        
+
+        public override bool checkException()
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            return str.Contains("raise");
+        }
+
         protected override void checkError()
         {
             base.checkError();

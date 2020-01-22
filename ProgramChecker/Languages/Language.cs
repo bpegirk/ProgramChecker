@@ -49,6 +49,17 @@ namespace ProgramChecker.Languages
 
         public abstract bool compile();
 
+        public virtual bool checkException()
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            return str.Contains("throw");
+        }
+
         public virtual string prepareTesting(Test test)
         {
             int checkId = check.checkId;

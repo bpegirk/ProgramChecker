@@ -216,6 +216,11 @@ namespace ProgramChecker
             {
                 Compiller cp = new Compiller(param);
 
+                if (cp.checkException())
+                {
+                    return "Использование Exception запрещено!";
+                }
+
                 bool cpStatus = cp.compile();
                 if (cpStatus)
                 {

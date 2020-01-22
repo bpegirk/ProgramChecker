@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using ProgramChecker.classes;
@@ -17,6 +18,17 @@ namespace ProgramChecker.Languages
         public override bool compile()
         {
             return runScriptCompile(nameScript);
+        }
+
+        public override bool checkException()
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            return str.Contains("Throw");
         }
 
         protected override Process createProcess()

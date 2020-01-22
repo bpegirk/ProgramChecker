@@ -14,21 +14,24 @@ namespace ProgramChecker.classes
         public static Language language;
 
         public Compiller(Check check)
-        { 
+        {
             this.check = check;
+            language = Language.getClass(check);
         }
 
         public bool compile()
         {
-            language = Language.getClass(check);
-
             return language.compile();
+        }
+
+        public bool checkException()
+        {
+            return  language.checkException();;
         }
 
         public string getError()
         {
             return language.getError();
         }
-
     }
 }

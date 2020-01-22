@@ -32,6 +32,17 @@ namespace ProgramChecker.Languages
             return runScriptCompile(nameScript);
         }
 
+        public override bool checkException()
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            return str.Contains("raise");
+        }
+
         protected override Process createProcess()
         {
             var compile = new Process
