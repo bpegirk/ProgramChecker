@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ProgramChecker.classes;
 
 namespace ProgramChecker.Languages
@@ -14,7 +15,28 @@ namespace ProgramChecker.Languages
 
         public override bool compile()
         {
+            removeUsesCrt();
             return runScriptCompile(nameScript);
+        }
+        
+        private void removeUsesCrt()
+        {
+            string str = string.Empty;
+            using (StreamReader reader = File.OpenText(pathFile))
+            {
+                str = reader.ReadToEnd();
+            }
+
+            string pattern = @"uses crt;";
+            Regex rgx = new Regex(pattern);
+            string usesCrt = rgx.Match(str).ToString();
+
+            str = Regex.Replace(str, pattern, "");
+            str = str.Replace(usesCrt, "");
+            using (StreamWriter file = new StreamWriter(pathFile))
+            {
+                file.Write(str);
+            }
         }
 
         public override bool checkException()
