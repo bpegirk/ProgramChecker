@@ -57,7 +57,7 @@ namespace ProgramChecker.Languages
                 str = reader.ReadToEnd();
             }
 
-            return str.Contains("throw");
+            return str.Equals("throw");
         }
 
         public virtual string prepareTesting(Test test)

@@ -8,7 +8,7 @@ namespace ProgramChecker.Languages
     class Pascal : Language
     {
         private new static string nameScript = "pasabc.cmd";
-        
+
         public Pascal(Check check) : base(check)
         {
         }
@@ -18,7 +18,7 @@ namespace ProgramChecker.Languages
             removeUsesCrt();
             return runScriptCompile(nameScript);
         }
-        
+
         private void removeUsesCrt()
         {
             string str = string.Empty;
@@ -32,7 +32,8 @@ namespace ProgramChecker.Languages
             string usesCrt = rgx.Match(str).ToString();
 
             str = Regex.Replace(str, pattern, "");
-            str = str.Replace(usesCrt, "");
+            if (!usesCrt.Equals(""))
+                str = str.Replace(usesCrt, "");
             using (StreamWriter file = new StreamWriter(pathFile))
             {
                 file.Write(str);
