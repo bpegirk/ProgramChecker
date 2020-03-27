@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ProgramChecker.classes;
 using System.IO;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace ProgramChecker.Languages
 {
@@ -56,8 +57,12 @@ namespace ProgramChecker.Languages
             {
                 str = reader.ReadToEnd();
             }
+            
+            string pattern = @"(\bthrow\b)";
+            Regex rgx = new Regex(pattern);
+            string find = rgx.Match(str).ToString();
 
-            return str.Equals("throw");
+            return !find.Equals("");
         }
 
         public virtual string prepareTesting(Test test)

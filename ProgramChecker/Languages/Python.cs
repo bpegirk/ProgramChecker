@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using ProgramChecker.classes;
 
 namespace ProgramChecker.Languages
@@ -40,7 +41,11 @@ namespace ProgramChecker.Languages
                 str = reader.ReadToEnd();
             }
 
-            return str.Contains("raise");
+            string pattern = @"(\braise\b)";
+            Regex rgx = new Regex(pattern);
+            string find = rgx.Match(str).ToString();
+
+            return !find.Equals("");
         }
 
         protected override Process createProcess()

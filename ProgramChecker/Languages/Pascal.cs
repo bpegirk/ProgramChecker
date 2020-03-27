@@ -48,7 +48,11 @@ namespace ProgramChecker.Languages
                 str = reader.ReadToEnd();
             }
 
-            return str.Contains("raise");
+            string pattern = @"(\braise|Raise\b)";
+            Regex rgx = new Regex(pattern);
+            string find = rgx.Match(str).ToString();
+
+            return !find.Equals("");
         }
 
         protected override void checkError()
