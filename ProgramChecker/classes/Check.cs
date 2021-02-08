@@ -11,6 +11,7 @@ namespace ProgramChecker.classes
         public const int PASS_FAIL = 2;
         public const int PASS_TIMEOUT = 3;
         public const int PASS_MEMORY_LIMIT = 4;
+        public const int PASS_TESTING_ERROR = 5;
 
         public const int PASCAL = 1;
         public const int C_SHARP_2008 = 2;

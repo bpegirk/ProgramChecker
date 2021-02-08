@@ -186,6 +186,7 @@ namespace ProgramChecker
             int parseDec = param.parseDec;
             bool timeout = false;
             bool memeryLimit = false;
+            bool testingError = false;
             string error = "";
             List<Result> results = new List<Result>();
             foreach (var test in tests)
@@ -194,14 +195,16 @@ namespace ProgramChecker
                 results.Add(testing.testing());
                 if (!timeout) timeout = testing.getTimeout();
                 if (!memeryLimit) memeryLimit = testing.getMemeryLimit();
+                if (!testingError) testingError = testing.getTestingError();
             }
 
             if (timeout) error = "Timeout";
             if (memeryLimit) error = "Memory Limit";
+            if (testingError) error = Compiller.language.getError();
             return new OutResult()
             {
                 checkId = checkId,
-                isError = timeout || memeryLimit,
+                isError = timeout || memeryLimit || testingError,
                 error = error,
                 parse_dec = param.parseDec,
                 results = results

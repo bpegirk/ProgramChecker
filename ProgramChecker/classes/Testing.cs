@@ -16,12 +16,13 @@ namespace ProgramChecker.classes
         private int checkId;
         private bool isForceKill;
         private bool isMemoryLimit;
+        private bool isTestingError;
         private int peakMemory;
         private int timeOut;
         private long spentTime;
         private int spentMemory;
         private int isParseDec;
-   
+
 
         public Testing(Test test, int checkId, int peakMemory, int timeOut, int isParseDec)
         {
@@ -58,12 +59,11 @@ namespace ProgramChecker.classes
             runTestFile(file, testSrc);
             int st = 0;
 
-            if (!isMemoryLimit && !isForceKill)
+            if (!isMemoryLimit && !isForceKill && !isTestingError)
             {
                 using (StreamReader sr = new StreamReader(testSrc + "/output.txt"))
                 {
                     outtext = clearString(sr.ReadToEnd(), isParseDec);
-
                 }
 
                 String testValue = clearString(test.output, isParseDec);
@@ -81,6 +81,11 @@ namespace ProgramChecker.classes
                 st = Check.PASS_MEMORY_LIMIT;
                 outtext = "Memory Limit";
             }
+            else if (isTestingError)
+            {
+                st = Check.PASS_TESTING_ERROR;
+                outtext = "Ошибка выполнения";
+            }
             else
             {
                 st = Check.PASS_TIMEOUT;
@@ -96,6 +101,7 @@ namespace ProgramChecker.classes
                 time = spentTime
             };
         }
+
         private String clearString(String s, int parseDec)
         {
             String[] splited = s.Replace("\r", "").Trim().Split('\n');
@@ -108,11 +114,13 @@ namespace ProgramChecker.classes
                     splited[i] = splited[i].Replace(',', '.');
                 }
             }
+
             String outStr = "";
             foreach (String p in splited)
             {
                 outStr += p + "\n";
             }
+
             return outStr.Trim();
         }
 
@@ -121,7 +129,7 @@ namespace ProgramChecker.classes
             string pathScript = Program.globalConfig["paths"]["scripts"];
             isForceKill = false;
             isMemoryLimit = false;
-            Thread.Sleep(300);// timeout for hold  and clear processes
+            Thread.Sleep(300); // timeout for hold  and clear processes
             Task runTesTask = new Task(() =>
             {
                 Language language = Compiller.language;
@@ -130,20 +138,31 @@ namespace ProgramChecker.classes
                 Stopwatch w = new Stopwatch();
                 compile.Start();
                 w.Start();
+                spentMemory = (int) (compile.PeakPagedMemorySize64 / 1024.0);
+                string errors = compile.StandardError.ReadToEnd();
+                language.setErrors(errors);
+                if (language.getError().Length > 0)
+                {
+                    isTestingError = true;
+                }
                 do
                 {
-                    if(compile.HasExited) break;
+                    if (compile.HasExited) break;
                     if (compile.PeakPagedMemorySize64 / 1024.0 > peakMemory) isMemoryLimit = true;
                     if (!compile.WaitForExit(timeOut))
                     {
                         isForceKill = true;
-                        compile.Kill();
-                    }
 
+                        if (!compile.HasExited)
+                        {
+                            compile.Kill();
+                        }
+                    }
                 } while (!compile.WaitForExit(timeOut));
+                
+                // compile.WaitForExit();
                 w.Stop();
                 spentTime = w.ElapsedMilliseconds;
-                spentMemory = (int)(compile.PeakPagedMemorySize64 / 1024.0);
             });
 
 
@@ -161,6 +180,11 @@ namespace ProgramChecker.classes
         public bool getMemeryLimit()
         {
             return isMemoryLimit;
+        }
+
+        public bool getTestingError()
+        {
+            return isTestingError;
         }
     }
 }

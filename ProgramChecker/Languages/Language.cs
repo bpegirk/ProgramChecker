@@ -90,6 +90,7 @@ namespace ProgramChecker.Languages
                 {
                     FileName = testFile,
                     RedirectStandardOutput = true,
+                    RedirectStandardError  = true,
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
                 }
@@ -138,7 +139,7 @@ namespace ProgramChecker.Languages
         protected virtual bool afterCompile()
         {
             bool isFileExist = File.Exists(checkFile);
-            ;
+            
             if (!isFileExist)
             {
                 lastError = errors.Length == 0 ? outString : errors.Last();
@@ -150,6 +151,11 @@ namespace ProgramChecker.Languages
         public string getError()
         {
             return lastError;
+        }
+
+        public void setErrors(string errors)
+        {
+            lastError = errors;
         }
 
         public static Language getClass(Check check)
