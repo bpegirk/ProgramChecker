@@ -97,6 +97,9 @@ namespace ProgramChecker.Languages
                     FileName = pathScript + "python.cmd",
                     Arguments = testFile,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    StandardErrorEncoding = Encoding.GetEncoding(1251),
+                    StandardOutputEncoding = Encoding.GetEncoding(1251),
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
                 }

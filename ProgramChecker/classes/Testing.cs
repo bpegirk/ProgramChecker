@@ -22,6 +22,7 @@ namespace ProgramChecker.classes
         private long spentTime;
         private int spentMemory;
         private int isParseDec;
+        private string error = "";
 
 
         public Testing(Test test, int checkId, int peakMemory, int timeOut, int isParseDec)
@@ -61,9 +62,16 @@ namespace ProgramChecker.classes
 
             if (!isMemoryLimit && !isForceKill && !isTestingError)
             {
-                using (StreamReader sr = new StreamReader(testSrc + "/output.txt"))
+                if (File.Exists(testSrc + "/output.txt"))
                 {
-                    outtext = clearString(sr.ReadToEnd(), isParseDec);
+                    using (StreamReader sr = new StreamReader(testSrc + "/output.txt"))
+                    {
+                        outtext = clearString(sr.ReadToEnd(), isParseDec);
+                    }
+                }
+                else
+                {
+                    outtext = "NOT FIND OUTPUT.TXT";
                 }
 
                 String testValue = clearString(test.output, isParseDec);
@@ -129,22 +137,19 @@ namespace ProgramChecker.classes
             string pathScript = Program.globalConfig["paths"]["scripts"];
             isForceKill = false;
             isMemoryLimit = false;
+            error = "";
             Thread.Sleep(300); // timeout for hold  and clear processes
             Task runTesTask = new Task(() =>
             {
                 Language language = Compiller.language;
                 var compile = language.createTestProcess(testExe, testSrc);
+                compile.ErrorDataReceived += this.ProcessErrorData;
                 spentTime = 0;
                 Stopwatch w = new Stopwatch();
                 compile.Start();
+                compile.BeginErrorReadLine();  
                 w.Start();
                 spentMemory = (int) (compile.PeakPagedMemorySize64 / 1024.0);
-                string errors = compile.StandardError.ReadToEnd();
-                language.setErrors(errors);
-                if (language.getError().Length > 0)
-                {
-                    isTestingError = true;
-                }
                 do
                 {
                     if (compile.HasExited) break;
@@ -160,8 +165,13 @@ namespace ProgramChecker.classes
                     }
                 } while (!compile.WaitForExit(timeOut));
                 
-                // compile.WaitForExit();
+                compile.WaitForExit();
                 w.Stop();
+                language.setErrors(error);
+                if (language.getError().Length > 0)
+                {
+                    isTestingError = true;
+                }
                 spentTime = w.ElapsedMilliseconds;
             });
 
@@ -169,6 +179,14 @@ namespace ProgramChecker.classes
             runTesTask.Start();
 
             Task.WaitAll(runTesTask);
+        }
+        
+        private void ProcessErrorData(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                error += e.Data;
+            }
         }
 
 

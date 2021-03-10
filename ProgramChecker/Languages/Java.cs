@@ -112,7 +112,10 @@ namespace ProgramChecker.Languages
                     FileName = pathScript + "javarun.cmd",
                     Arguments = testFile,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
+                    StandardErrorEncoding = Encoding.GetEncoding(1251),
+                    StandardOutputEncoding = Encoding.GetEncoding(1251),
                     WorkingDirectory = testSrc
                 }
             };
