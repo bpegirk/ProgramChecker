@@ -165,7 +165,6 @@ namespace ProgramChecker.classes
                     }
                 } while (!compile.WaitForExit(timeOut));
                 
-                compile.WaitForExit();
                 w.Stop();
                 language.setErrors(error);
                 if (language.getError().Length > 0)
