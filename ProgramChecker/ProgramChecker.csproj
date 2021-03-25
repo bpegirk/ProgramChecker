@@ -73,7 +73,18 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="scripts\cpp.cmd" />
+    <Content Include="scripts\delphi.cmd" />
+    <Content Include="scripts\msvb.cmd" />
+    <Content Include="scripts\msvb2013.cmd" />
+    <Content Include="scripts\msvcpp.cmd" />
+    <Content Include="scripts\msvcpp2013.cmd" />
+    <Content Include="scripts\msvcs.cmd" />
+    <Content Include="scripts\msvcs2013.cmd" />
+    <Content Include="scripts\pasabc.cmd" />
+    <Content Include="scripts\python.cmd" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
