@@ -58,6 +58,7 @@
     <Compile Include="Languages\Cpp.cs" />
     <Compile Include="Languages\CSharp.cs" />
     <Compile Include="Languages\Delphi.cs" />
+    <Compile Include="Languages\Go.cs" />
     <Compile Include="Languages\Java.cs" />
     <Compile Include="Languages\Language.cs" />
     <Compile Include="Languages\Pascal.cs" />
@@ -76,6 +77,7 @@
   <ItemGroup>
     <Content Include="scripts\cpp.cmd" />
     <Content Include="scripts\delphi.cmd" />
+    <Content Include="scripts\golang.cmd" />
     <Content Include="scripts\msvb.cmd" />
     <Content Include="scripts\msvb2013.cmd" />
     <Content Include="scripts\msvcpp.cmd" />

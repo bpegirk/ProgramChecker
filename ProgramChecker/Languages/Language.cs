@@ -23,7 +23,8 @@ namespace ProgramChecker.Languages
             {Check.VB_2013, "VB"},
             {Check.C_PLUS_2013, "VCpp"},
             {Check.JAVA, "Java"},
-            {Check.PYTHON, "Python"}
+            {Check.PYTHON, "Python"},
+            {Check.GO, "Go"},
         };
 
         protected readonly Check check;
