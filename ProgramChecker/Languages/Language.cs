@@ -25,6 +25,7 @@ namespace ProgramChecker.Languages
             {Check.JAVA, "Java"},
             {Check.PYTHON, "Python"},
             {Check.GO, "Go"},
+            {Check.NODE_JS, "NodeJs"}
         };
 
         protected readonly Check check;

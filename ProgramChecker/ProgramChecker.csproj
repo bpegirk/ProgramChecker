@@ -61,6 +61,7 @@
     <Compile Include="Languages\Go.cs" />
     <Compile Include="Languages\Java.cs" />
     <Compile Include="Languages\Language.cs" />
+    <Compile Include="Languages\NodeJS.cs" />
     <Compile Include="Languages\Pascal.cs" />
     <Compile Include="Languages\Python.cs" />
     <Compile Include="Languages\VB.cs" />
@@ -84,6 +85,7 @@
     <Content Include="scripts\msvcpp2013.cmd" />
     <Content Include="scripts\msvcs.cmd" />
     <Content Include="scripts\msvcs2013.cmd" />
+    <Content Include="scripts\nodejs.cmd" />
     <Content Include="scripts\pasabc.cmd" />
     <Content Include="scripts\python.cmd" />
   </ItemGroup>

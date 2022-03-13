@@ -25,6 +25,7 @@ namespace ProgramChecker.classes
         public const int JAVA = 10;
         public const int PYTHON = 11;
         public const int GO = 12;
+        public const int NODE_JS = 13;
 
 
         public int checkId { get; set; }
