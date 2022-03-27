@@ -74,7 +74,7 @@ namespace ProgramChecker.Languages
 
         protected override void checkError()
         {
-            lastError = compileProcess.StandardError.ReadToEnd();
+            lastError = isForceKill ? "Timeout" : compileProcess.StandardError.ReadToEnd();
         }
 
         public override string prepareTesting(Test test)

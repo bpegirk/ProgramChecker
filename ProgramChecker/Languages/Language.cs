@@ -13,19 +13,20 @@ namespace ProgramChecker.Languages
     public abstract class Language
     {
         protected string pathScript = Program.globalConfig["paths"]["scripts"];
+        protected bool isForceKill;
 
         public static Dictionary<int, string> languages = new Dictionary<int, string>
         {
-            {Check.PASCAL, "Pascal"},
-            {Check.DELPHI, "Delphi"},
-            {Check.C_BUILDER, "Cpp"},
-            {Check.C_SHARP_2013, "CSharp"},
-            {Check.VB_2013, "VB"},
-            {Check.C_PLUS_2013, "VCpp"},
-            {Check.JAVA, "Java"},
-            {Check.PYTHON, "Python"},
-            {Check.GO, "Go"},
-            {Check.NODE_JS, "NodeJs"}
+            { Check.PASCAL, "Pascal" },
+            { Check.DELPHI, "Delphi" },
+            { Check.C_BUILDER, "Cpp" },
+            { Check.C_SHARP_2013, "CSharp" },
+            { Check.VB_2013, "VB" },
+            { Check.C_PLUS_2013, "VCpp" },
+            { Check.JAVA, "Java" },
+            { Check.PYTHON, "Python" },
+            { Check.GO, "Go" },
+            { Check.NODE_JS, "NodeJs" }
         };
 
         protected readonly Check check;
@@ -59,7 +60,7 @@ namespace ProgramChecker.Languages
             {
                 str = reader.ReadToEnd();
             }
-            
+
             string pattern = @"(\bthrow\b)";
             Regex rgx = new Regex(pattern);
             string find = rgx.Match(str).ToString();
@@ -92,7 +93,7 @@ namespace ProgramChecker.Languages
                 {
                     FileName = testFile,
                     RedirectStandardOutput = true,
-                    RedirectStandardError  = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
                     WorkingDirectory = testSrc
                 }
@@ -109,6 +110,19 @@ namespace ProgramChecker.Languages
 
             compileProcess = createProcess();
             compileProcess.Start();
+
+            do
+            {
+                if (compileProcess.HasExited) break;
+                if (!compileProcess.WaitForExit(3000))
+                {
+                    isForceKill = true;
+                    if (!compileProcess.HasExited)
+                    {
+                        compileProcess.Kill();
+                    }
+                }
+            } while (!compileProcess.WaitForExit(3000));
 
             checkError();
 
@@ -134,14 +148,21 @@ namespace ProgramChecker.Languages
 
         protected virtual void checkError()
         {
-            string outString = compileProcess.StandardOutput.ReadToEnd();
-            errors = outString.Split('\n');
+            if (isForceKill)
+            {
+                errors[0] = "Timeout";
+            }
+            else
+            {
+                string outString = compileProcess.StandardOutput.ReadToEnd();
+                errors = outString.Split('\n');
+            }
         }
 
         protected virtual bool afterCompile()
         {
             bool isFileExist = File.Exists(checkFile);
-            
+
             if (!isFileExist)
             {
                 lastError = errors.Length == 0 ? outString : errors.Last();
@@ -167,9 +188,9 @@ namespace ProgramChecker.Languages
 
             if (TestType != null)
             {
-                System.Reflection.ConstructorInfo ci = TestType.GetConstructor(new Type[] {typeof(Check)});
+                System.Reflection.ConstructorInfo ci = TestType.GetConstructor(new Type[] { typeof(Check) });
 
-                language = (Language) ci.Invoke(new object[] {check});
+                language = (Language)ci.Invoke(new object[] { check });
             }
 
             return language;
