@@ -33,7 +33,7 @@ namespace ProgramChecker.Languages
             base.checkError();
             errors = errors
                 .Where(x => x.Contains($"check_{check.checkId}.go"))
-                .ToArray();
+                .ToList();
         }
 
         public override bool compile()

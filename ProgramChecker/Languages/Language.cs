@@ -38,7 +38,7 @@ namespace ProgramChecker.Languages
         protected readonly string checkFile;
         protected Process compileProcess;
         protected string outString;
-        protected string[] errors;
+        protected List<string> errors = new List<string>();
         private readonly string extension;
 
         protected Language(Check check, string extension = "exe")
@@ -114,7 +114,7 @@ namespace ProgramChecker.Languages
             do
             {
                 if (compileProcess.HasExited) break;
-                if (!compileProcess.WaitForExit(3000))
+                if (!compileProcess.WaitForExit(10000))
                 {
                     isForceKill = true;
                     if (!compileProcess.HasExited)
@@ -122,7 +122,7 @@ namespace ProgramChecker.Languages
                         compileProcess.Kill();
                     }
                 }
-            } while (!compileProcess.WaitForExit(3000));
+            } while (!compileProcess.WaitForExit(10000));
 
             checkError();
 
@@ -150,12 +150,12 @@ namespace ProgramChecker.Languages
         {
             if (isForceKill)
             {
-                errors[0] = "Timeout";
+                errors.Add("Timeout");
             }
             else
             {
                 string outString = compileProcess.StandardOutput.ReadToEnd();
-                errors = outString.Split('\n');
+                errors = outString.Split('\n').ToList();
             }
         }
 
@@ -165,7 +165,7 @@ namespace ProgramChecker.Languages
 
             if (!isFileExist)
             {
-                lastError = errors.Length == 0 ? outString : errors.Last();
+                lastError = errors.Count == 0 ? outString : errors.Last();
             }
 
             return isFileExist;

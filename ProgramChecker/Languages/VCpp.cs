@@ -21,7 +21,7 @@ namespace ProgramChecker.Languages
             base.checkError();
             errors = errors
                 .Where(x => x.Contains("error"))
-                .ToArray();
+                .ToList();
         }
     }
 }

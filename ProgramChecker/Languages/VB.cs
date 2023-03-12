@@ -58,7 +58,7 @@ namespace ProgramChecker.Languages
             base.checkError();
             errors = errors
                 .Where(x => x.Contains("error BC"))
-                .ToArray();
+                .ToList();
         }
     }
 }

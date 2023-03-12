@@ -60,7 +60,7 @@ namespace ProgramChecker.Languages
             base.checkError();
             errors = errors
                 .Where(x => x.Contains($"check_{check.checkId}.pas:"))
-                .ToArray();
+                .ToList();
         }
     }
 }

@@ -46,7 +46,7 @@ namespace ProgramChecker.Languages
         protected override void checkError()
         {
             string error = compileProcess.StandardError.ReadToEnd();
-            errors = error.Split('\n').ToArray();
+            errors = error.Split('\n').ToList();
         }
 
         protected override bool afterCompile()
@@ -54,7 +54,7 @@ namespace ProgramChecker.Languages
             bool isFileExist = File.Exists(checkFile);
             if (!isFileExist)
             {
-                lastError = errors.Length == 0 ? outString : errors.First();
+                lastError = errors.Count == 0 ? outString : errors.First();
             }
             else
             {
