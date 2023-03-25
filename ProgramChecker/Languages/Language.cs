@@ -95,6 +95,8 @@ namespace ProgramChecker.Languages
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    StandardOutputEncoding = Encoding.UTF8,
                     WorkingDirectory = testSrc
                 }
             };
