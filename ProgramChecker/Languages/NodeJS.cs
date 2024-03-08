@@ -59,7 +59,7 @@ namespace ProgramChecker.Languages
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    StandardOutputEncoding = null,
+                    StandardOutputEncoding = Encoding.UTF8,
                     WorkingDirectory = pathCompile
                 }
             };

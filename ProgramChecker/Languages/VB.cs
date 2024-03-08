@@ -57,7 +57,7 @@ namespace ProgramChecker.Languages
                     Arguments = pathCompile + " " + pathCompile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
-                    StandardOutputEncoding = Encoding.Default,
+                    StandardOutputEncoding = Encoding.UTF8,
                 }
             };
 
