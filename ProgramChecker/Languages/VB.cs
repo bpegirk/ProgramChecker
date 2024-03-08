@@ -13,11 +13,22 @@ namespace ProgramChecker.Languages
         
         public VB(Check check) : base(check)
         {
-            pathCompile += @"\check_" + check.checkId;
         }
 
         public override bool compile()
         {
+            Directory.CreateDirectory(pathCompile);
+            string compileFile = $"{pathCompile}check_{check.checkId}.vb";
+            if (!File.Exists(compileFile))
+            {
+                File.Copy(pathFile, compileFile);
+            }
+            string vbprojFile = $"{pathCompile}check_{check.checkId}.vbproj";
+            if (!File.Exists(vbprojFile))
+            {
+                File.Create(vbprojFile).Close();
+                File.WriteAllText(vbprojFile,  Program.globalConfig["build"]["net"]);
+            }
             return runScriptCompile(nameScript);
         }
 
@@ -43,7 +54,7 @@ namespace ProgramChecker.Languages
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pathScript + nameScript,
-                    Arguments = pathFile + " " + pathCompile,
+                    Arguments = pathCompile + " " + pathCompile,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     StandardOutputEncoding = Encoding.Default,

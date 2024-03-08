@@ -27,7 +27,9 @@ namespace ProgramChecker
             mainConfig["paths"]["src"] = currDir + "src\\";
             mainConfig["paths"]["queue"] = currDir + "queue\\";
             mainConfig["paths"]["results"] = currDir + "results\\";
-            mainConfig["paths"]["scripts"] = @"C:\Users\iumag\Desktop\scripts\";
+            mainConfig["paths"]["scripts"] = currDir + "scripts\\";
+            mainConfig["build"]["net"] =
+                @"<Project Sdk=""Microsoft.NET.Sdk""><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net6.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><PublishSingleFile>true</PublishSingleFile><SelfContained>true</SelfContained></PropertyGroup></Project>";
             // init config
             var parser = new FileIniDataParser();
             if (!File.Exists(configFile))
@@ -137,7 +139,7 @@ namespace ProgramChecker
                 }
 
                 Console.Write("==> Write data to result.txt ... ");
-                
+
                 writeResult(param.checkId, outResult);
 
                 Console.WriteLine("DONE.");
@@ -152,7 +154,7 @@ namespace ProgramChecker
                 outResult.parse_dec = param.parseDec;
                 outResult.error = ex.Message;
                 outResult.results = null;
-                
+
                 writeResult(param.checkId, outResult);
 
                 Console.Write("Can't read file " + file + ": " + ex.Message);
