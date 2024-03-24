@@ -35,6 +35,7 @@ namespace ProgramChecker.Languages
                     FileName = pathScript + nameScript,
                     Arguments = pathFile + " " + pathCompile,
                     RedirectStandardError = true,
+                    RedirectStandardOutput = true,
                     UseShellExecute = false,
                     StandardOutputEncoding = Encoding.UTF8,
                 }

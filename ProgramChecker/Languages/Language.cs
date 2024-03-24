@@ -116,7 +116,7 @@ namespace ProgramChecker.Languages
             do
             {
                 if (compileProcess.HasExited) break;
-                if (!compileProcess.WaitForExit(10000))
+                if (!compileProcess.WaitForExit(30000))
                 {
                     isForceKill = true;
                     if (!compileProcess.HasExited)
@@ -124,7 +124,7 @@ namespace ProgramChecker.Languages
                         compileProcess.Kill();
                     }
                 }
-            } while (!compileProcess.WaitForExit(10000));
+            } while (!compileProcess.WaitForExit(30000));
 
             checkError();
 
